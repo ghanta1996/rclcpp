@@ -113,8 +113,10 @@ TEST_F(TestServiceIntrospection, service_introspection_nominal)
 
   // wrap up work to get all the service_event messages
   auto start = std::chrono::steady_clock::now();
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
   while (events.size() < 4 && (std::chrono::steady_clock::now() - start) < timeout) {
-    rclcpp::spin_some(node);
+    executor.spin_some();
   }
 
   std::map<uint8_t, std::shared_ptr<const BasicTypes::Event>> event_map;
@@ -173,6 +175,9 @@ TEST_F(TestServiceIntrospection, service_introspection_enable_disable_events)
   service->configure_introspection(
     node->get_clock(), rclcpp::ServicesQoS(), RCL_SERVICE_INTROSPECTION_OFF);
 
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
+
   ASSERT_EQ(sub->get_publisher_count(), 0);
 
   auto request = std::make_shared<BasicTypes::Request>();
@@ -184,7 +189,7 @@ TEST_F(TestServiceIntrospection, service_introspection_enable_disable_events)
     rclcpp::spin_until_future_complete(node, future, timeout));
   auto start = std::chrono::steady_clock::now();
   while ((std::chrono::steady_clock::now() - start) < timeout) {
-    rclcpp::spin_some(node);
+    executor.spin_some();
   }
   EXPECT_EQ(events.size(), 0U);
 
@@ -208,7 +213,7 @@ TEST_F(TestServiceIntrospection, service_introspection_enable_disable_events)
     rclcpp::spin_until_future_complete(node, future, timeout));
   start = std::chrono::steady_clock::now();
   while (events.size() < 2 && (std::chrono::steady_clock::now() - start) < timeout) {
-    rclcpp::spin_some(node);
+    executor.spin_some();
   }
   EXPECT_EQ(events.size(), 2U);
 
@@ -232,7 +237,7 @@ TEST_F(TestServiceIntrospection, service_introspection_enable_disable_events)
     rclcpp::spin_until_future_complete(node, future, timeout));
   start = std::chrono::steady_clock::now();
   while (events.size() < 2 && (std::chrono::steady_clock::now() - start) < timeout) {
-    rclcpp::spin_some(node);
+    executor.spin_some();
   }
   EXPECT_EQ(events.size(), 2U);
 
@@ -256,7 +261,7 @@ TEST_F(TestServiceIntrospection, service_introspection_enable_disable_events)
     rclcpp::spin_until_future_complete(node, future, timeout));
   start = std::chrono::steady_clock::now();
   while (events.size() < 4 && (std::chrono::steady_clock::now() - start) < timeout) {
-    rclcpp::spin_some(node);
+    executor.spin_some();
   }
   EXPECT_EQ(events.size(), 4U);
 }
@@ -267,6 +272,9 @@ TEST_F(TestServiceIntrospection, service_introspection_enable_disable_event_cont
     node->get_clock(), rclcpp::ServicesQoS(), RCL_SERVICE_INTROSPECTION_METADATA);
   service->configure_introspection(
     node->get_clock(), rclcpp::ServicesQoS(), RCL_SERVICE_INTROSPECTION_METADATA);
+
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
 
   // Wait for the introspection to attach to our subscription
   size_t tries = 1000;
@@ -284,7 +292,7 @@ TEST_F(TestServiceIntrospection, service_introspection_enable_disable_event_cont
     rclcpp::spin_until_future_complete(node, future, timeout));
   auto start = std::chrono::steady_clock::now();
   while (events.size() < 4 && (std::chrono::steady_clock::now() - start) < timeout) {
-    rclcpp::spin_some(node);
+    executor.spin_some();
   }
   EXPECT_EQ(events.size(), 4U);
   for (const auto & event : events) {
@@ -312,7 +320,7 @@ TEST_F(TestServiceIntrospection, service_introspection_enable_disable_event_cont
     rclcpp::spin_until_future_complete(node, future, timeout));
   start = std::chrono::steady_clock::now();
   while (events.size() < 4 && (std::chrono::steady_clock::now() - start) < timeout) {
-    rclcpp::spin_some(node);
+    executor.spin_some();
   }
   EXPECT_EQ(events.size(), 4U);
   for (const auto & event : events) {
@@ -352,7 +360,7 @@ TEST_F(TestServiceIntrospection, service_introspection_enable_disable_event_cont
     rclcpp::spin_until_future_complete(node, future, timeout));
   start = std::chrono::steady_clock::now();
   while (events.size() < 4 && (std::chrono::steady_clock::now() - start) < timeout) {
-    rclcpp::spin_some(node);
+    executor.spin_some();
   }
   EXPECT_EQ(events.size(), 4U);
   for (const auto & event : events) {
@@ -392,7 +400,7 @@ TEST_F(TestServiceIntrospection, service_introspection_enable_disable_event_cont
     rclcpp::spin_until_future_complete(node, future, timeout));
   start = std::chrono::steady_clock::now();
   while (events.size() < 4 && (std::chrono::steady_clock::now() - start) < timeout) {
-    rclcpp::spin_some(node);
+    executor.spin_some();
   }
   EXPECT_EQ(events.size(), 4U);
   for (const auto & event : events) {
